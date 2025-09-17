@@ -1,20 +1,31 @@
 package com.example.browserstack;
 
-import com.vansah.VansahNode;
-import org.junit.jupiter.api.*;
-import org.openqa.selenium.*;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import com.vansah.VansahNode;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VansahBrowserStackTest {
@@ -25,7 +36,7 @@ public class VansahBrowserStackTest {
     private String sessionName;
 
     @BeforeEach
-    void setUp() throws MalformedURLException {
+    void setUp() throws MalformedURLException, URISyntaxException {
         String username = System.getProperty("BROWSERSTACK_USERNAME", System.getenv("BROWSERSTACK_USERNAME"));
         String accessKey = System.getProperty("BROWSERSTACK_ACCESS_KEY", System.getenv("BROWSERSTACK_ACCESS_KEY"));
         if (username == null || accessKey == null) {
@@ -50,7 +61,7 @@ public class VansahBrowserStackTest {
         caps.setCapability("bstack:options", bstackOptions);
 
         String hub = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
-        driver = new RemoteWebDriver(new URL(hub), caps);
+        driver = new RemoteWebDriver(new URI(hub).toURL(), caps);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
         // Vansah setup
@@ -94,7 +105,7 @@ public class VansahBrowserStackTest {
 
     @Test
     @Order(1)
-    void visitExampleDotComAndAssertTitle() throws IOException {
+    void visitExampleDotComAndAssertTitle() throws IOException, MalformedURLException, URISyntaxException {
         try {
             driver.get("https://www.example.com/");
             takeStepScreenshotAndLogToVansah("passed", "Loaded example.com home page", 1);
@@ -102,10 +113,10 @@ public class VansahBrowserStackTest {
             Assertions.assertTrue(title != null && !title.isEmpty(), "Title should not be empty");
             setBrowserStackStatus("passed", "Title check passed");
             vansah.addTestLog("passed", "Title is present: " + title, 2);
-        } catch (Throwable t) {
-            setBrowserStackStatus("failed", t.getMessage());
-            vansah.updateTestLog("failed", "Failure: " + t.getMessage());
-            Assertions.fail(t);
+        } catch (Exception e) {
+            setBrowserStackStatus("failed", e.getMessage());
+            vansah.updateTestLog("failed", "Failure: " + e.getMessage());
+            Assertions.fail(e);
         }
     }
 
