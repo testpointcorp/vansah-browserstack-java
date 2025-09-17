@@ -36,6 +36,7 @@ public class VansahBrowserStackTest {
     private String sessionName;
 
     @BeforeEach
+    @SuppressWarnings("unused") // Used by JUnit 5
     void setUp() throws MalformedURLException, URISyntaxException {
         String username = System.getProperty("BROWSERSTACK_USERNAME", System.getenv("BROWSERSTACK_USERNAME"));
         String accessKey = System.getProperty("BROWSERSTACK_ACCESS_KEY", System.getenv("BROWSERSTACK_ACCESS_KEY"));
@@ -113,7 +114,7 @@ public class VansahBrowserStackTest {
             Assertions.assertTrue(title != null && !title.isEmpty(), "Title should not be empty");
             setBrowserStackStatus("passed", "Title check passed");
             vansah.addTestLog("passed", "Title is present: " + title, 2);
-        } catch (Exception e) {
+        } catch (AssertionError | RuntimeException e) {
             setBrowserStackStatus("failed", e.getMessage());
             vansah.updateTestLog("failed", "Failure: " + e.getMessage());
             Assertions.fail(e);
@@ -137,6 +138,7 @@ public class VansahBrowserStackTest {
     }
 
     @AfterEach
+    @SuppressWarnings("unused") // Used by JUnit 5
     void tearDown() {
         if (driver != null) {
             driver.quit();
