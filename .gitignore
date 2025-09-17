@@ -1,0 +1,14 @@
+# Maven
+target/
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+
+# Env / secrets
+.env
+browserstack.yml

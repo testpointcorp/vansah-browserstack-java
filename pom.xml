@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.example</groupId>
+  <artifactId>vansah-browserstack-junit5</artifactId>
+  <version>1.0.0</version>
+  <name>Vansah + BrowserStack (JUnit 5)</name>
+  <description>Sample Maven project showing how to send BrowserStack Selenium test results to Vansah using the Vansah Java binding.</description>
+
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <junit.jupiter.version>5.10.2</junit.jupiter.version>
+    <selenium.version>4.21.0</selenium.version>
+  </properties>
+
+  <dependencies>
+    <!-- Test framework -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Selenium WebDriver -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+
+    <!-- Vansah binding prerequisites (per Vansah README) -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.12.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.mashape.unirest</groupId>
+      <artifactId>unirest-java</artifactId>
+      <version>1.4.9</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <systemPropertyVariables>
+            <!-- Let env vars flow into tests -->
+            <BROWSERSTACK_USERNAME>${env.BROWSERSTACK_USERNAME}</BROWSERSTACK_USERNAME>
+            <BROWSERSTACK_ACCESS_KEY>${env.BROWSERSTACK_ACCESS_KEY}</BROWSERSTACK_ACCESS_KEY>
+            <BROWSERSTACK_BUILD_NAME>${env.BROWSERSTACK_BUILD_NAME}</BROWSERSTACK_BUILD_NAME>
+            <BROWSERSTACK_PROJECT_NAME>${env.BROWSERSTACK_PROJECT_NAME}</BROWSERSTACK_PROJECT_NAME>
+            <BROWSERSTACK_SESSION_NAME>${env.BROWSERSTACK_SESSION_NAME}</BROWSERSTACK_SESSION_NAME>
+
+            <VANSAH_URL>${env.VANSAH_URL}</VANSAH_URL>
+            <VANSAH_TOKEN>${env.VANSAH_TOKEN}</VANSAH_TOKEN>
+            <VANSAH_PROJECT_KEY>${env.VANSAH_PROJECT_KEY}</VANSAH_PROJECT_KEY>
+            <VANSAH_FOLDER_PATH>${env.VANSAH_FOLDER_PATH}</VANSAH_FOLDER_PATH>
+            <VANSAH_STP_KEY>${env.VANSAH_STP_KEY}</VANSAH_STP_KEY>
+            <VANSAH_ATP_KEY>${env.VANSAH_ATP_KEY}</VANSAH_ATP_KEY>
+            <VANSAH_ATP_ASSET_TYPE>${env.VANSAH_ATP_ASSET_TYPE}</VANSAH_ATP_ASSET_TYPE>
+            <VANSAH_JIRA_ISSUE_KEY>${env.VANSAH_JIRA_ISSUE_KEY}</VANSAH_JIRA_ISSUE_KEY>
+            <VANSAH_TESTCASE_KEY>${env.VANSAH_TESTCASE_KEY}</VANSAH_TESTCASE_KEY>
+            <VANSAH_ENVIRONMENT>${env.VANSAH_ENVIRONMENT}</VANSAH_ENVIRONMENT>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
