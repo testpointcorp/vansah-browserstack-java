@@ -12,3 +12,9 @@ target/
 # Env / secrets
 .env
 browserstack.yml
+
+# Local tooling / artifacts
+BrowserStackLocal
+BrowserStackLocal.exe
+BrowserStackLocal.zip
+target/screenshots/
