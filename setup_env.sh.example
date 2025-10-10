@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# BrowserStack Local Testing Configuration
+export BROWSERSTACK_USERNAME="your_browserstack_username"
+export BROWSERSTACK_ACCESS_KEY="your_browserstack_access_key"
+export BROWSERSTACK_LOCAL_FOLDER_URL="http://localhost:8080"
+export BROWSERSTACK_BUILD_NAME="Vansah Build"
+export BROWSERSTACK_PROJECT_NAME="Vansah BrowserStack"
+export BROWSERSTACK_SESSION_NAME="Local run"
+
+# Vansah Configuration (you need to get these)
+export VANSAH_URL="https://prod.vansahnode.app"
+export VANSAH_TOKEN="your_vansah_token_here"
+export VANSAH_ENVIRONMENT="QA"
+export VANSAH_PROJECT_KEY="YOUR_JIRA_PROJECT_KEY"
+
+# Jira + Vansah Integration (you need to get these)
+export VANSAH_JIRA_ISSUE_KEY="YOUR_ISSUE_KEY"
+export VANSAH_TESTCASE_KEY="YOUR_TESTCASE_KEY"
+
+echo "✅ Environment variables template loaded!"
+echo "⚠️  You need to configure:"
+echo "   - BROWSERSTACK_USERNAME (from https://www.browserstack.com/)"
+echo "   - BROWSERSTACK_ACCESS_KEY (from https://www.browserstack.com/)"
+echo "   - VANSAH_TOKEN (from https://www.vansah.com/)"
+echo "   - VANSAH_JIRA_ISSUE_KEY (create an issue in Jira)"
+echo "   - VANSAH_TESTCASE_KEY (create a test case in Jira)"
+echo ""
+echo "1. Copy this file: cp setup_env.sh.example setup_env.sh"
+echo "2. Edit setup_env.sh with your real credentials"
+echo "3. Run: source setup_env.sh"
+echo "4. Run tests: mvn test"
+

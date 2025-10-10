@@ -45,11 +45,12 @@ public class LocalTest {
             }
             
             // Test Vansah integration (without actual API calls)
-            VansahNode vansah = new VansahNode();
-            System.out.println("✅ VansahNode created successfully");
-            
-            // Simulate test log (won't actually send to Vansah without proper config)
-            System.out.println("ℹ️  Vansah integration ready (needs proper credentials)");
+        VansahNode.setProjectKey(System.getProperty("VANSAH_PROJECT_KEY", System.getenv("VANSAH_PROJECT_KEY")));
+        VansahNode vansah = new VansahNode();
+        System.out.println("✅ VansahNode created successfully");
+        
+        // Simulate test log (won't actually send to Vansah without proper config)
+        System.out.println("ℹ️  Vansah integration ready (needs proper credentials)");
             
         } finally {
             if (driver != null) {

@@ -11,10 +11,21 @@ target/
 
 # Env / secrets
 .env
+.env.*
+!.env.example
 browserstack.yml
+setup_env.sh
+**/credentials.json
+**/secrets.json
+**/config.local.*
 
 # Local tooling / artifacts
 BrowserStackLocal
 BrowserStackLocal.exe
 BrowserStackLocal.zip
 target/screenshots/
+
+# Sensitive documentation (if you create backups)
+*credentials*
+*secrets*
+CREDENTIAL_LEAK_REPORT.md

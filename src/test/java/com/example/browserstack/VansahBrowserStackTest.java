@@ -72,35 +72,41 @@ public class VansahBrowserStackTest {
         String jiraIssueKey = System.getProperty("VANSAH_JIRA_ISSUE_KEY", System.getenv("VANSAH_JIRA_ISSUE_KEY"));
         String environment = System.getProperty("VANSAH_ENVIRONMENT", System.getenv("VANSAH_ENVIRONMENT"));
         testCaseKey = System.getProperty("VANSAH_TESTCASE_KEY", System.getenv("VANSAH_TESTCASE_KEY"));
+        String projectKey = System.getProperty("VANSAH_PROJECT_KEY", System.getenv("VANSAH_PROJECT_KEY"));
 
         if (vansahUrl != null) vansah.setVansahURL(vansahUrl);
         if (vansahToken != null) vansah.setVansahToken(vansahToken);
         if (environment != null) vansah.setENVIRONMENT_NAME(environment);
+        if (projectKey != null) VansahNode.setProjectKey(projectKey);
         if (jiraIssueKey != null) {
             vansah.setJIRA_ISSUE_KEY(jiraIssueKey);
         }
 
         // Prefer JIRA issue based run if keys are present; else, fall back to folder/plan based via env vars
-        if (testCaseKey != null && jiraIssueKey != null) {
-            vansah.addTestRunFromJIRAIssue(testCaseKey);
-        } else {
-            String folderPath = System.getProperty("VANSAH_FOLDER_PATH", System.getenv("VANSAH_FOLDER_PATH"));
-            String stpKey = System.getProperty("VANSAH_STP_KEY", System.getenv("VANSAH_STP_KEY"));
-            String atpKey = System.getProperty("VANSAH_ATP_KEY", System.getenv("VANSAH_ATP_KEY"));
-            String atpAsset = System.getProperty("VANSAH_ATP_ASSET_TYPE", System.getenv("VANSAH_ATP_ASSET_TYPE")); // folder|issue
-
-            if (testCaseKey != null && folderPath != null) {
-                vansah.setFOLDERPATH(folderPath);
-                vansah.addTestRunFromTestFolder(testCaseKey);
-            } else if (testCaseKey != null && atpKey != null && atpAsset != null) {
-                vansah.setAdvancedTestPlanKey(atpKey);
-                vansah.addTestRunFromAdvancedTestPlan(atpAsset, testCaseKey);
-            } else if (testCaseKey != null && stpKey != null) {
-                vansah.setStandardTestPlanKey(stpKey);
-                vansah.addTestRunFromStandardTestPlan(testCaseKey);
+        try {
+            if (testCaseKey != null && jiraIssueKey != null) {
+                vansah.addTestRunFromJIRAIssue(testCaseKey);
             } else {
-                System.out.println("[INFO] Vansah is not fully configured. The test will run on BrowserStack, but results will not be pushed to Vansah until env vars are set.");
+                String folderPath = System.getProperty("VANSAH_FOLDER_PATH", System.getenv("VANSAH_FOLDER_PATH"));
+                String stpKey = System.getProperty("VANSAH_STP_KEY", System.getenv("VANSAH_STP_KEY"));
+                String atpKey = System.getProperty("VANSAH_ATP_KEY", System.getenv("VANSAH_ATP_KEY"));
+                String atpAsset = System.getProperty("VANSAH_ATP_ASSET_TYPE", System.getenv("VANSAH_ATP_ASSET_TYPE")); // folder|issue
+
+                if (testCaseKey != null && folderPath != null) {
+                    vansah.setFOLDERPATH(folderPath);
+                    vansah.addTestRunFromTestFolder(testCaseKey);
+                } else if (testCaseKey != null && atpKey != null && atpAsset != null) {
+                    vansah.setAdvancedTestPlanKey(atpKey);
+                    vansah.addTestRunFromAdvancedTestPlan(atpAsset, testCaseKey);
+                } else if (testCaseKey != null && stpKey != null) {
+                    vansah.setStandardTestPlanKey(stpKey);
+                    vansah.addTestRunFromStandardTestPlan(testCaseKey);
+                } else {
+                    System.out.println("[INFO] Vansah is not fully configured. The test will run on BrowserStack, but results will not be pushed to Vansah until env vars are set.");
+                }
             }
+        } catch (Exception e) {
+            Assertions.fail("Failed to create Vansah test run: " + e.getMessage(), e);
         }
     }
 
@@ -113,10 +119,10 @@ public class VansahBrowserStackTest {
             String title = driver.getTitle();
             Assertions.assertTrue(title != null && !title.isEmpty(), "Title should not be empty");
             setBrowserStackStatus("passed", "Title check passed");
-            vansah.addTestLog("passed", "Title is present: " + title, 2);
+            safeAddTestLog("passed", "Title is present: " + title, 2, null);
         } catch (AssertionError | RuntimeException e) {
             setBrowserStackStatus("failed", e.getMessage());
-            vansah.updateTestLog("failed", "Failure: " + e.getMessage());
+            safeUpdateTestLog("failed", "Failure: " + e.getMessage());
             Assertions.fail(e);
         }
     }
@@ -134,7 +140,7 @@ public class VansahBrowserStackTest {
         Files.createDirectories(out);
         Path file = out.resolve(sessionName.replaceAll("[^A-Za-z0-9._-]", "_") + "_step" + step + ".png");
         Files.copy(tmp.toPath(), file, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-        vansah.addTestLog(result, comment, step, file.toFile());
+        safeAddTestLog(result, comment, step, file.toFile());
     }
 
     @AfterEach
@@ -142,6 +148,28 @@ public class VansahBrowserStackTest {
     void tearDown() {
         if (driver != null) {
             driver.quit();
+        }
+    }
+
+    private void safeAddTestLog(String result, String comment, Integer step, File screenshot) {
+        if (vansah == null) return;
+        try {
+            if (screenshot != null) {
+                vansah.addTestLog(result, comment, step, screenshot);
+            } else {
+                vansah.addTestLog(result, comment, step);
+            }
+        } catch (Exception e) {
+            System.out.println("[WARN] Unable to add Vansah test log: " + e.getMessage());
+        }
+    }
+
+    private void safeUpdateTestLog(String result, String comment) {
+        if (vansah == null) return;
+        try {
+            vansah.updateTestLog(result, comment);
+        } catch (Exception e) {
+            System.out.println("[WARN] Unable to update Vansah test log: " + e.getMessage());
         }
     }
 }

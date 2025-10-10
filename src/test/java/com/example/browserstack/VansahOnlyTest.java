@@ -52,20 +52,26 @@ public class VansahOnlyTest {
         String jiraIssueKey = System.getProperty("VANSAH_JIRA_ISSUE_KEY", System.getenv("VANSAH_JIRA_ISSUE_KEY"));
         String environment = System.getProperty("VANSAH_ENVIRONMENT", System.getenv("VANSAH_ENVIRONMENT"));
         testCaseKey = System.getProperty("VANSAH_TESTCASE_KEY", System.getenv("VANSAH_TESTCASE_KEY"));
+        String projectKey = System.getProperty("VANSAH_PROJECT_KEY", System.getenv("VANSAH_PROJECT_KEY"));
 
         if (vansahUrl != null) vansah.setVansahURL(vansahUrl);
         if (vansahToken != null) vansah.setVansahToken(vansahToken);
         if (environment != null) vansah.setENVIRONMENT_NAME(environment);
+        if (projectKey != null) VansahNode.setProjectKey(projectKey);
         if (jiraIssueKey != null) {
             vansah.setJIRA_ISSUE_KEY(jiraIssueKey);
         }
 
         // Create test run if configured
-        if (testCaseKey != null && jiraIssueKey != null) {
-            vansah.addTestRunFromJIRAIssue(testCaseKey);
-            System.out.println("✅ Vansah test run created for: " + testCaseKey);
-        } else {
-            System.out.println("ℹ️  Vansah not fully configured. Test will run locally without Vansah integration.");
+        try {
+            if (testCaseKey != null && jiraIssueKey != null) {
+                vansah.addTestRunFromJIRAIssue(testCaseKey);
+                System.out.println("✅ Vansah test run created for: " + testCaseKey);
+            } else {
+                System.out.println("ℹ️  Vansah not fully configured. Test will run locally without Vansah integration.");
+            }
+        } catch (Exception e) {
+            Assertions.fail("Failed to create Vansah test run: " + e.getMessage(), e);
         }
     }
 
@@ -79,17 +85,17 @@ public class VansahOnlyTest {
             
             String title = driver.getTitle();
             Assertions.assertTrue(title != null && !title.isEmpty(), "Title should not be empty");
-            vansah.addTestLog("passed", "Title is present: " + title, 2);
+            safeAddTestLog("passed", "Title is present: " + title, 2, null);
             
             // Test page content
             String bodyText = driver.findElement(By.tagName("body")).getText();
             Assertions.assertTrue(bodyText.contains("Example Domain"), "Page should contain 'Example Domain'");
-            vansah.addTestLog("passed", "Page content verified: " + bodyText.substring(0, Math.min(50, bodyText.length())) + "...", 3);
+            safeAddTestLog("passed", "Page content verified: " + bodyText.substring(0, Math.min(50, bodyText.length())) + "...", 3, null);
             
             System.out.println("✅ Test completed successfully!");
             
         } catch (AssertionError | RuntimeException e) {
-            vansah.updateTestLog("failed", "Failure: " + e.getMessage());
+            safeUpdateTestLog("failed", "Failure: " + e.getMessage());
             System.err.println("❌ Test failed: " + e.getMessage());
             Assertions.fail(e);
         }
@@ -105,7 +111,7 @@ public class VansahOnlyTest {
         Files.copy(tmp.toPath(), file, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         
         // Log to Vansah if configured
-        vansah.addTestLog(result, comment, step, file.toFile());
+        safeAddTestLog(result, comment, step, file.toFile());
         
         System.out.println("📸 Screenshot saved: " + file);
     }
@@ -116,6 +122,28 @@ public class VansahOnlyTest {
         if (driver != null) {
             driver.quit();
             System.out.println("✅ Browser closed");
+        }
+    }
+
+    private void safeAddTestLog(String result, String comment, Integer step, File screenshot) {
+        if (vansah == null) return;
+        try {
+            if (screenshot != null) {
+                vansah.addTestLog(result, comment, step, screenshot);
+            } else {
+                vansah.addTestLog(result, comment, step);
+            }
+        } catch (Exception e) {
+            System.out.println("[WARN] Unable to add Vansah test log: " + e.getMessage());
+        }
+    }
+
+    private void safeUpdateTestLog(String result, String comment) {
+        if (vansah == null) return;
+        try {
+            vansah.updateTestLog(result, comment);
+        } catch (Exception e) {
+            System.out.println("[WARN] Unable to update Vansah test log: " + e.getMessage());
         }
     }
 }
