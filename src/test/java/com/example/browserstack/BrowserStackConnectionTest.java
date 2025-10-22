@@ -1,5 +1,6 @@
 package com.example.browserstack;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,17 +11,28 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 public class BrowserStackConnectionTest {
 
     @Test
     void testBrowserStackConnection() throws MalformedURLException, URISyntaxException {
-        String username = System.getProperty("BROWSERSTACK_USERNAME", System.getenv("BROWSERSTACK_USERNAME"));
-        String accessKey = System.getProperty("BROWSERSTACK_ACCESS_KEY", System.getenv("BROWSERSTACK_ACCESS_KEY"));
-        
+        // Load .env file from project root
+        Dotenv dotenv = Dotenv.configure()
+                .directory(new File("").getAbsolutePath())
+                .ignoreIfMalformed()
+                .ignoreIfMissing()
+                .load();
+
+        String username = dotenv.get("BROWSERSTACK_USERNAME");
+       
+
+        String accessKey = dotenv.get("BROWSERSTACK_ACCESS_KEY");
+       
         System.out.println("Testing BrowserStack connection...");
         System.out.println("Username: " + username);
         System.out.println("Access Key: " + (accessKey != null ? accessKey.substring(0, 8) + "..." : "NULL"));
-        
+
         if (username == null || accessKey == null) {
             throw new RuntimeException("Missing BROWSERSTACK_USERNAME or BROWSERSTACK_ACCESS_KEY");
         }
@@ -40,7 +52,7 @@ public class BrowserStackConnectionTest {
 
         String hub = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
         System.out.println("Hub URL: " + hub.replace(accessKey, "***"));
-        
+
         RemoteWebDriver driver = null;
         try {
             driver = new RemoteWebDriver(new URI(hub).toURL(), caps);

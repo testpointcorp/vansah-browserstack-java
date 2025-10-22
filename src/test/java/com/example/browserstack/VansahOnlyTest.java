@@ -22,6 +22,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import com.vansah.VansahNode;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VansahOnlyTest {
 
@@ -34,6 +36,11 @@ public class VansahOnlyTest {
     @SuppressWarnings("unused") // Used by JUnit 5
     void setUp() {
         // Setup local Chrome driver
+         Dotenv dotenv = Dotenv.configure()
+                .directory(new File("").getAbsolutePath())
+                .ignoreIfMalformed()
+                .ignoreIfMissing()
+                .load();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless"); // Run in background
         options.addArguments("--no-sandbox");
@@ -47,12 +54,12 @@ public class VansahOnlyTest {
 
         // Vansah setup
         vansah = new VansahNode();
-        String vansahUrl = System.getProperty("VANSAH_URL", System.getenv("VANSAH_URL"));
-        String vansahToken = System.getProperty("VANSAH_TOKEN", System.getenv("VANSAH_TOKEN"));
-        String jiraIssueKey = System.getProperty("VANSAH_JIRA_ISSUE_KEY", System.getenv("VANSAH_JIRA_ISSUE_KEY"));
-        String environment = System.getProperty("VANSAH_ENVIRONMENT", System.getenv("VANSAH_ENVIRONMENT"));
-        testCaseKey = System.getProperty("VANSAH_TESTCASE_KEY", System.getenv("VANSAH_TESTCASE_KEY"));
-        String projectKey = System.getProperty("VANSAH_PROJECT_KEY", System.getenv("VANSAH_PROJECT_KEY"));
+        String vansahUrl = dotenv.get("VANSAH_URL");
+        String vansahToken = dotenv.get("VANSAH_TOKEN");
+        String jiraIssueKey = dotenv.get("VANSAH_JIRA_ISSUE_KEY");
+        String environment = dotenv.get("VANSAH_ENVIRONMENT");
+        testCaseKey = dotenv.get("VANSAH_TESTCASE_KEY");
+        String projectKey = dotenv.get("VANSAH_PROJECT_KEY");
 
         if (vansahUrl != null) vansah.setVansahURL(vansahUrl);
         if (vansahToken != null) vansah.setVansahToken(vansahToken);

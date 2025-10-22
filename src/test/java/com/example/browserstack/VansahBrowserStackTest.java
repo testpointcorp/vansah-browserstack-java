@@ -27,6 +27,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.vansah.VansahNode;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class VansahBrowserStackTest {
 
@@ -38,16 +40,20 @@ public class VansahBrowserStackTest {
     @BeforeEach
     @SuppressWarnings("unused") // Used by JUnit 5
     void setUp() throws MalformedURLException, URISyntaxException {
-        String username = System.getProperty("BROWSERSTACK_USERNAME", System.getenv("BROWSERSTACK_USERNAME"));
-        String accessKey = System.getProperty("BROWSERSTACK_ACCESS_KEY", System.getenv("BROWSERSTACK_ACCESS_KEY"));
+        Dotenv dotenv = Dotenv.configure()
+                .directory(new File("").getAbsolutePath())
+                .ignoreIfMalformed()
+                .ignoreIfMissing()
+                .load();
+        String username = dotenv.get("BROWSERSTACK_USERNAME");
+        String accessKey = dotenv.get("BROWSERSTACK_ACCESS_KEY");
         if (username == null || accessKey == null) {
             Assertions.fail("Missing BROWSERSTACK_USERNAME or BROWSERSTACK_ACCESS_KEY env vars.");
         }
 
-        sessionName = System.getProperty("BROWSERSTACK_SESSION_NAME", "Vansah + BrowserStack JUnit5 example");
-        String buildName = System.getProperty("BROWSERSTACK_BUILD_NAME", "vansah-browserstack-build");
-        String projectName = System.getProperty("BROWSERSTACK_PROJECT_NAME", "Vansah BrowserStack");
-
+        this.sessionName = dotenv.get("BROWSERSTACK_SESSION_NAME", "Vansah + BrowserStack JUnit5 example");
+        String buildName = dotenv.get("BROWSERSTACK_BUILD_NAME", "vansah-browserstack-build");
+        String projectName = dotenv.get("BROWSERSTACK_PROJECT_NAME", "Vansah BrowserStack");
         // W3C Capabilities
         Map<String, Object> bstackOptions = new HashMap<>();
         bstackOptions.put("os", "Windows");
@@ -67,22 +73,27 @@ public class VansahBrowserStackTest {
 
         // Vansah setup
         vansah = new VansahNode();
-        String vansahUrl = System.getProperty("VANSAH_URL", System.getenv("VANSAH_URL"));
-        String vansahToken = System.getProperty("VANSAH_TOKEN", System.getenv("VANSAH_TOKEN"));
-        String jiraIssueKey = System.getProperty("VANSAH_JIRA_ISSUE_KEY", System.getenv("VANSAH_JIRA_ISSUE_KEY"));
-        String environment = System.getProperty("VANSAH_ENVIRONMENT", System.getenv("VANSAH_ENVIRONMENT"));
-        testCaseKey = System.getProperty("VANSAH_TESTCASE_KEY", System.getenv("VANSAH_TESTCASE_KEY"));
-        String projectKey = System.getProperty("VANSAH_PROJECT_KEY", System.getenv("VANSAH_PROJECT_KEY"));
+        String vansahUrl = dotenv.get("VANSAH_URL");
+        String vansahToken = dotenv.get("VANSAH_TOKEN");
+        String jiraIssueKey = dotenv.get("VANSAH_JIRA_ISSUE_KEY");
+        String environment = dotenv.get("VANSAH_ENVIRONMENT");
+        testCaseKey = dotenv.get("VANSAH_TESTCASE_KEY");
+        String projectKey = dotenv.get("VANSAH_PROJECT_KEY");
 
-        if (vansahUrl != null) vansah.setVansahURL(vansahUrl);
-        if (vansahToken != null) vansah.setVansahToken(vansahToken);
-        if (environment != null) vansah.setENVIRONMENT_NAME(environment);
-        if (projectKey != null) VansahNode.setProjectKey(projectKey);
+        if (vansahUrl != null)
+            vansah.setVansahURL(vansahUrl);
+        if (vansahToken != null)
+            vansah.setVansahToken(vansahToken);
+        if (environment != null)
+            vansah.setENVIRONMENT_NAME(environment);
+        if (projectKey != null)
+            VansahNode.setProjectKey(projectKey);
         if (jiraIssueKey != null) {
             vansah.setJIRA_ISSUE_KEY(jiraIssueKey);
         }
 
-        // Prefer JIRA issue based run if keys are present; else, fall back to folder/plan based via env vars
+        // Prefer JIRA issue based run if keys are present; else, fall back to
+        // folder/plan based via env vars
         try {
             if (testCaseKey != null && jiraIssueKey != null) {
                 vansah.addTestRunFromJIRAIssue(testCaseKey);
@@ -102,7 +113,8 @@ public class VansahBrowserStackTest {
                     vansah.setStandardTestPlanKey(stpKey);
                     vansah.addTestRunFromStandardTestPlan(testCaseKey);
                 } else {
-                    System.out.println("[INFO] Vansah is not fully configured. The test will run on BrowserStack, but results will not be pushed to Vansah until env vars are set.");
+                    System.out.println(
+                            "[INFO] Vansah is not fully configured. The test will run on BrowserStack, but results will not be pushed to Vansah until env vars are set.");
                 }
             }
         } catch (Exception e) {
@@ -129,13 +141,17 @@ public class VansahBrowserStackTest {
 
     private void setBrowserStackStatus(String status, String reason) {
         try {
-            ((JavascriptExecutor) driver).executeScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"" + status + "\", \"reason\": \"" + reason + "\"}}");
-        } catch (Exception ignored) {}
+            ((JavascriptExecutor) driver).executeScript(
+                    "browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"" + status
+                            + "\", \"reason\": \"" + reason + "\"}}");
+        } catch (Exception ignored) {
+        }
     }
 
     private void takeStepScreenshotAndLogToVansah(String result, String comment, int step) throws IOException {
-        if (!(driver instanceof TakesScreenshot)) return;
-        File tmp = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        if (!(driver instanceof TakesScreenshot))
+            return;
+        File tmp = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         Path out = Path.of("target", "screenshots");
         Files.createDirectories(out);
         Path file = out.resolve(sessionName.replaceAll("[^A-Za-z0-9._-]", "_") + "_step" + step + ".png");
@@ -152,7 +168,8 @@ public class VansahBrowserStackTest {
     }
 
     private void safeAddTestLog(String result, String comment, Integer step, File screenshot) {
-        if (vansah == null) return;
+        if (vansah == null)
+            return;
         try {
             if (screenshot != null) {
                 vansah.addTestLog(result, comment, step, screenshot);
@@ -165,7 +182,8 @@ public class VansahBrowserStackTest {
     }
 
     private void safeUpdateTestLog(String result, String comment) {
-        if (vansah == null) return;
+        if (vansah == null)
+            return;
         try {
             vansah.updateTestLog(result, comment);
         } catch (Exception e) {

@@ -38,6 +38,12 @@
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
     </dependency>
+    <!--Add this depandancy if you want to get the value from .env-->
+     <dependency>
+      <groupId>io.github.cdimascio</groupId>
+      <artifactId>dotenv-kotlin</artifactId>
+      <version>6.5.1</version>
+    </dependency>
 
     <!-- Vansah binding prerequisites (per Vansah README) -->
     <dependency>

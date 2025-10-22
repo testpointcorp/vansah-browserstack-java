@@ -4,21 +4,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.json.JSONObject;
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 
 public class VansahNode {
@@ -40,7 +38,7 @@ public class VansahNode {
      * Note: This should be set to a valid project key (e.g., "DEMO").
      * If null or empty, related API calls may not function correctly.
      */	
-	private static String PROJECT_KEY = null;
+	private static String PROJECT_KEY = "DT";
 	
 	/**
 	 * The key of the Advanced Test Plan (ATP) in Vansah.
