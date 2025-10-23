@@ -27,6 +27,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.vansah.VansahNode;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BrowserStackLocalTest {
 
@@ -38,10 +40,16 @@ public class BrowserStackLocalTest {
     @BeforeEach
     @SuppressWarnings("unused") // Used by JUnit 5
     void setUp() throws MalformedURLException, URISyntaxException {
-        String username = System.getProperty("BROWSERSTACK_USERNAME", System.getenv("BROWSERSTACK_USERNAME"));
-        String accessKey = System.getProperty("BROWSERSTACK_ACCESS_KEY", System.getenv("BROWSERSTACK_ACCESS_KEY"));
-        String localFolderUrl = System.getProperty("BROWSERSTACK_LOCAL_FOLDER_URL", System.getenv("BROWSERSTACK_LOCAL_FOLDER_URL"));
-        
+         Dotenv dotenv = Dotenv.configure()
+                .directory(new File("").getAbsolutePath())
+                .ignoreIfMalformed()
+                .ignoreIfMissing()
+                .load();
+
+        String username = dotenv.get("BROWSERSTACK_USERNAME");
+       
+
+        String accessKey = dotenv.get("BROWSERSTACK_ACCESS_KEY");
         if (username == null || accessKey == null) {
             Assertions.fail("Missing BROWSERSTACK_USERNAME or BROWSERSTACK_ACCESS_KEY env vars.");
         }
@@ -57,14 +65,13 @@ public class BrowserStackLocalTest {
         bstackOptions.put("sessionName", sessionName);
         bstackOptions.put("projectName", projectName);
         bstackOptions.put("buildName", buildName);
-        bstackOptions.put("local", "true"); // Enable local testing
-        bstackOptions.put("localIdentifier", "vansah-test"); // Unique identifier
+        bstackOptions.put("local", "false"); // Enable local testing
+       // bstackOptions.put("localIdentifier", "vansah-test"); // Unique identifier
 
         DesiredCapabilities caps = new DesiredCapabilities();
         caps.setCapability("browserName", "Chrome");
         caps.setCapability("browserVersion", "latest");
         caps.setCapability("bstack:options", bstackOptions);
-
         // Use local testing endpoint
         String hub = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
         driver = new RemoteWebDriver(new URI(hub).toURL(), caps);
@@ -72,12 +79,12 @@ public class BrowserStackLocalTest {
 
         // Vansah setup
         vansah = new VansahNode();
-        String vansahUrl = System.getProperty("VANSAH_URL", System.getenv("VANSAH_URL"));
-        String vansahToken = System.getProperty("VANSAH_TOKEN", System.getenv("VANSAH_TOKEN"));
-        String jiraIssueKey = System.getProperty("VANSAH_JIRA_ISSUE_KEY", System.getenv("VANSAH_JIRA_ISSUE_KEY"));
-        String environment = System.getProperty("VANSAH_ENVIRONMENT", System.getenv("VANSAH_ENVIRONMENT"));
-        testCaseKey = System.getProperty("VANSAH_TESTCASE_KEY", System.getenv("VANSAH_TESTCASE_KEY"));
-        String projectKey = System.getProperty("VANSAH_PROJECT_KEY", System.getenv("VANSAH_PROJECT_KEY"));
+        String vansahUrl = dotenv.get("VANSAH_URL");
+        String vansahToken = dotenv.get("VANSAH_TOKEN");
+        String jiraIssueKey = dotenv.get("VANSAH_JIRA_ISSUE_KEY");
+        String environment = dotenv.get("VANSAH_ENVIRONMENT");
+        testCaseKey = dotenv.get("VANSAH_TESTCASE_KEY");
+        String projectKey = dotenv.get("VANSAH_PROJECT_KEY");
 
         if (vansahUrl != null) vansah.setVansahURL(vansahUrl);
         if (vansahToken != null) vansah.setVansahToken(vansahToken);
