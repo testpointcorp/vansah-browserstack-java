@@ -108,6 +108,10 @@ public class TestSetup {
         String environment = dotenv.get("VANSAH_ENVIRONMENT");
         testCaseKey = dotenv.get("VANSAH_TESTCASE_KEY");
         String projectKey = dotenv.get("VANSAH_PROJECT_KEY");
+        String folderPath = dotenv.get("VANSAH_FOLDER_PATH");
+        String stpKey = System.getProperty("VANSAH_STP_KEY", System.getenv("VANSAH_STP_KEY"));
+        String atpKey = System.getProperty("VANSAH_ATP_KEY", System.getenv("VANSAH_ATP_KEY"));
+        String atpAsset = System.getProperty("VANSAH_ATP_ASSET_TYPE", System.getenv("VANSAH_ATP_ASSET_TYPE")); // folder|issue
 
         if (vansahUrl != null)
             vansah.setVansahURL(vansahUrl);
@@ -119,32 +123,14 @@ public class TestSetup {
             VansahNode.setProjectKey(projectKey);
         if (jiraIssueKey != null)
             vansah.setJIRA_ISSUE_KEY(jiraIssueKey);
+        if(folderPath != null)
+            vansah.setFOLDERPATH(folderPath);
+        if(stpKey != null)
+            vansah.setStandardTestPlanKey(stpKey);
+        if(atpKey != null && atpAsset != null)
+            vansah.setAdvancedTestPlanKey(atpKey); //Define atpAsset type   
 
-        try {
-            if (testCaseKey != null && jiraIssueKey != null) {
-                vansah.addTestRunFromJIRAIssue(testCaseKey);
-            } else {
-                String folderPath = System.getProperty("VANSAH_FOLDER_PATH", System.getenv("VANSAH_FOLDER_PATH"));
-                String stpKey = System.getProperty("VANSAH_STP_KEY", System.getenv("VANSAH_STP_KEY"));
-                String atpKey = System.getProperty("VANSAH_ATP_KEY", System.getenv("VANSAH_ATP_KEY"));
-                String atpAsset = System.getProperty("VANSAH_ATP_ASSET_TYPE", System.getenv("VANSAH_ATP_ASSET_TYPE")); // folder|issue
-
-                if (testCaseKey != null && folderPath != null) {
-                    vansah.setFOLDERPATH(folderPath);
-                    vansah.addTestRunFromTestFolder(testCaseKey);
-                } else if (testCaseKey != null && atpKey != null && atpAsset != null) {
-                    vansah.setAdvancedTestPlanKey(atpKey);
-                    vansah.addTestRunFromAdvancedTestPlan(atpAsset, testCaseKey);
-                } else if (testCaseKey != null && stpKey != null) {
-                    vansah.setStandardTestPlanKey(stpKey);
-                    vansah.addTestRunFromStandardTestPlan(testCaseKey);
-                } else {
-                    System.out.println(
-                            "[INFO] Vansah is not fully configured. The test will run on BrowserStack, but results will not be pushed to Vansah until env vars are set.");
-                }
-            }
-        } catch (Exception e) {
-            Assertions.fail("Failed to create Vansah test run: " + e.getMessage(), e);
-        }
+        // vansah.addTestRunFromAdvancedTestPlan(atpAsset, testCaseKey);
+        // vansah.addTestRunFromStandardTestPlan(testCaseKey);            
     }
 }

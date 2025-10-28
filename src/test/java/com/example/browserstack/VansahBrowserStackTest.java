@@ -37,8 +37,10 @@ public class VansahBrowserStackTest extends TestSetup {
     /**
      * Visits the target website and validates that the page title is not empty.
      * 
-     * If successful, it logs the step result in Vansah for a Jira Work item and sets the BrowserStack session status
-     * to "passed". Otherwise, it marks the session as "failed" and logs the error in Vansah.
+     * If successful, it logs the step result in Vansah for a Jira Work item and
+     * sets the BrowserStack session status
+     * to "passed". Otherwise, it marks the session as "failed" and logs the error
+     * in Vansah.
      *
      * @throws IOException           if an error occurs during screenshot capture or
      *                               file operations
@@ -47,13 +49,45 @@ public class VansahBrowserStackTest extends TestSetup {
      */
     @Test
     @Order(1)
-    void demoJiraWorkItemAssertTitle() throws IOException, MalformedURLException, URISyntaxException {
+    void demoJiraWorkItemAssertTitle() throws Exception {
         try {
+            vansah.addTestRunFromJIRAIssue(testCaseKey);
             driver.get("https://selenium.vansah.io/");
-            takeStepScreenshotAndLogToVansah("passed", "Loaded example.com home page", 1);
+            takeStepScreenshotAndLogToVansah("passed", "Loaded home page", 1);
 
             String title = driver.getTitle();
             Assertions.assertTrue(title != null && !title.isEmpty(), "Title should not be empty");
+
+            setBrowserStackStatus("passed", "Title check passed");
+            safeAddTestLog("passed", "Title is present: " + title, 2, null);
+        } catch (AssertionError | RuntimeException e) {
+            setBrowserStackStatus("failed", e.getMessage());
+            safeUpdateTestLog("failed", "Failure: " + e.getMessage());
+            Assertions.fail(e);
+        }
+    }
+
+    /**
+     * Visits the target website and validates that the page title is not empty.
+     * 
+     * If successful, it logs the step result in Vansah for a Test Folder in Vansah
+     * and sets the BrowserStack session status
+     * to "passed". Otherwise, it marks the session as "failed" and logs the error
+     * in Vansah.
+     * 
+     * @throws Exception
+     */
+    @Test
+    @Order(2)
+    void demoTestFolderAssertTitle() throws Exception {
+        try {
+            vansah.addTestRunFromTestFolder(testCaseKey);
+            driver.get("https://selenium.vansah.io/");
+            takeStepScreenshotAndLogToVansah("passed", "Loaded home page", 1);
+
+            String title = driver.getTitle();
+            Assertions.assertTrue(title == "Selenium Website Testing Page – ",
+                    "Title should match with `Selenium Website Testing Page – Use this page to automate `");
 
             setBrowserStackStatus("passed", "Title check passed");
             safeAddTestLog("passed", "Title is present: " + title, 2, null);
@@ -93,7 +127,7 @@ public class VansahBrowserStackTest extends TestSetup {
      * @throws IOException if an error occurs while creating directories or copying
      *                     files
      */
-    private void takeStepScreenshotAndLogToVansah(String result, String comment, int step) throws IOException {
+    private void takeStepScreenshotAndLogToVansah(String result, String comment, int step) throws IOException{
         if (!(driver instanceof TakesScreenshot))
             return;
 
@@ -101,7 +135,15 @@ public class VansahBrowserStackTest extends TestSetup {
         Path out = Path.of("target", "screenshots");
         Files.createDirectories(out);
 
-        Path file = out.resolve(sessionName.replaceAll("[^A-Za-z0-9._-]", "_") + "_step" + step + ".png");
+        // Generate a unique filename using timestamp and random suffix
+        String timestamp = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS"));
+        String uniqueId = java.util.UUID.randomUUID().toString().substring(0, 8);
+
+        String safeSessionName = sessionName.replaceAll("[^A-Za-z0-9._-]", "_");
+        String fileName = String.format("%s_step%d_%s_%s.png", safeSessionName, step, timestamp, uniqueId);
+
+        Path file = out.resolve(fileName);
         Files.copy(tmp.toPath(), file, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 
         safeAddTestLog(result, comment, step, file.toFile());
