@@ -25,6 +25,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import com.browserstack.local.Local;
 import com.vansah.VansahNode;
 
 import io.github.cdimascio.dotenv.Dotenv;
@@ -36,20 +37,20 @@ public class BrowserStackLocalTest {
     private VansahNode vansah;
     private String testCaseKey;
     private String sessionName;
+    private Local bsLocal; // BrowserStack Local instance
 
     @BeforeEach
-    @SuppressWarnings("unused") // Used by JUnit 5
-    void setUp() throws MalformedURLException, URISyntaxException {
-         Dotenv dotenv = Dotenv.configure()
+    void setUp() throws Exception {
+        // Load environment variables
+        Dotenv dotenv = Dotenv.configure()
                 .directory(new File("").getAbsolutePath())
                 .ignoreIfMalformed()
                 .ignoreIfMissing()
                 .load();
 
         String username = dotenv.get("BROWSERSTACK_USERNAME");
-       
-
         String accessKey = dotenv.get("BROWSERSTACK_ACCESS_KEY");
+
         if (username == null || accessKey == null) {
             Assertions.fail("Missing BROWSERSTACK_USERNAME or BROWSERSTACK_ACCESS_KEY env vars.");
         }
@@ -58,21 +59,33 @@ public class BrowserStackLocalTest {
         String buildName = System.getProperty("BROWSERSTACK_BUILD_NAME", "vansah-browserstack-local");
         String projectName = System.getProperty("BROWSERSTACK_PROJECT_NAME", "Vansah BrowserStack Local");
 
-        // BrowserStack Local Testing capabilities
+        // Start BrowserStack Local
+        bsLocal = new Local();
+        Map<String, String> options = new HashMap<>();
+        options.put("key", accessKey);
+        options.put("localIdentifier", "vansah-test");
+        bsLocal.start(options);
+
+        // Wait until local is running
+        while (!bsLocal.isRunning()) {
+            Thread.sleep(500);
+        }
+
+        // BrowserStack capabilities
         Map<String, Object> bstackOptions = new HashMap<>();
         bstackOptions.put("os", "Windows");
         bstackOptions.put("osVersion", "11");
         bstackOptions.put("sessionName", sessionName);
         bstackOptions.put("projectName", projectName);
         bstackOptions.put("buildName", buildName);
-        bstackOptions.put("local", "false"); // Enable local testing
-       // bstackOptions.put("localIdentifier", "vansah-test"); // Unique identifier
+        bstackOptions.put("local", "true");
+        bstackOptions.put("localIdentifier", "vansah-test");
 
         DesiredCapabilities caps = new DesiredCapabilities();
         caps.setCapability("browserName", "Chrome");
         caps.setCapability("browserVersion", "latest");
         caps.setCapability("bstack:options", bstackOptions);
-        // Use local testing endpoint
+
         String hub = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
         driver = new RemoteWebDriver(new URI(hub).toURL(), caps);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
@@ -90,16 +103,13 @@ public class BrowserStackLocalTest {
         if (vansahToken != null) vansah.setVansahToken(vansahToken);
         if (environment != null) vansah.setENVIRONMENT_NAME(environment);
         if (projectKey != null) VansahNode.setProjectKey(projectKey);
-        if (jiraIssueKey != null) {
-            vansah.setJIRA_ISSUE_KEY(jiraIssueKey);
-        }
+        if (jiraIssueKey != null) vansah.setJIRA_ISSUE_KEY(jiraIssueKey);
 
-        // Create test run if configured
         try {
             if (testCaseKey != null && jiraIssueKey != null) {
                 vansah.addTestRunFromJIRAIssue(testCaseKey);
             } else {
-                System.out.println("[INFO] Vansah is not fully configured. The test will run on BrowserStack Local, but results will not be pushed to Vansah until env vars are set.");
+                System.out.println("[INFO] Vansah is not fully configured. Test will run on BrowserStack Local, but results will not be pushed to Vansah until env vars are set.");
             }
         } catch (Exception e) {
             Assertions.fail("Failed to create Vansah test run: " + e.getMessage(), e);
@@ -110,19 +120,13 @@ public class BrowserStackLocalTest {
     @Order(1)
     void testLocalWebsiteAndAssertTitle() throws IOException, MalformedURLException, URISyntaxException {
         try {
-            // Test a local website (you can change this to your local app)
-            String localUrl = System.getProperty("BROWSERSTACK_LOCAL_FOLDER_URL", System.getenv("BROWSERSTACK_LOCAL_FOLDER_URL"));
-            if (localUrl != null) {
-                driver.get(localUrl);
-                takeStepScreenshotAndLogToVansah("passed", "Loaded local website: " + localUrl, 1);
-            } else {
-                // Fallback to a public website
-                driver.get("https://www.example.com/");
-                takeStepScreenshotAndLogToVansah("passed", "Loaded example.com home page", 1);
-            }
-            
+            String localUrl = "http://localhost:5173/auth";
+            driver.get(localUrl);
+            takeStepScreenshotAndLogToVansah("passed", "Loaded local website: " + localUrl, 1);
+
             String title = driver.getTitle();
             Assertions.assertTrue(title != null && !title.isEmpty(), "Title should not be empty");
+
             setBrowserStackStatus("passed", "Title check passed");
             safeAddTestLog("passed", "Title is present: " + title, 2, null);
         } catch (AssertionError | RuntimeException e) {
@@ -134,7 +138,9 @@ public class BrowserStackLocalTest {
 
     private void setBrowserStackStatus(String status, String reason) {
         try {
-            ((JavascriptExecutor) driver).executeScript("browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"" + status + "\", \"reason\": \"" + reason + "\"}}");
+            ((JavascriptExecutor) driver).executeScript(
+                "browserstack_executor: {\"action\": \"setSessionStatus\", \"arguments\": {\"status\":\"" 
+                + status + "\", \"reason\": \"" + reason + "\"}}");
         } catch (Exception ignored) {}
     }
 
@@ -149,10 +155,10 @@ public class BrowserStackLocalTest {
     }
 
     @AfterEach
-    @SuppressWarnings("unused") // Used by JUnit 5
-    void tearDown() {
-        if (driver != null) {
-            driver.quit();
+    void tearDown() throws Exception {
+        if (driver != null) driver.quit();
+        if (bsLocal != null && bsLocal.isRunning()) {
+            try { bsLocal.stop(); } catch(Exception ignored) {}
         }
     }
 
