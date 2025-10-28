@@ -762,7 +762,7 @@ public class VansahNode {
 					if(SEND_SCREENSHOT) {
 
 						requestBody.append("attachments", addAttachment(FILE));
-
+						SEND_SCREENSHOT = false;
 					}
 					requestBody.accumulate("project", jiraProjectAsset());
 
