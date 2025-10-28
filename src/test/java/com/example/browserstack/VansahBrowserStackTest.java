@@ -3,17 +3,12 @@ package com.example.browserstack;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -21,115 +16,45 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.vansah.VansahNode;
-
-import io.github.cdimascio.dotenv.Dotenv;
-
+/**
+ * This test class demonstrates a Selenium BrowserStack integration
+ * that captures test execution results and logs them to Vansah.
+ *
+ * It extends TestSetup, which initializes WebDriver and Vansah integration
+ * setup.
+ *
+ * The test includes:
+ * 1. Launching a target URL
+ * 2. Asserting the page title
+ * 3. Capturing screenshots
+ * 4. Logging results to Vansah
+ * 5. Updating session status in BrowserStack
+ */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class VansahBrowserStackTest {
+public class VansahBrowserStackTest extends TestSetup {
 
-    private WebDriver driver;
-    private VansahNode vansah;
-    private String testCaseKey;
-    private String sessionName;
-
-    @BeforeEach
-    @SuppressWarnings("unused") // Used by JUnit 5
-    void setUp() throws MalformedURLException, URISyntaxException {
-        Dotenv dotenv = Dotenv.configure()
-                .directory(new File("").getAbsolutePath())
-                .ignoreIfMalformed()
-                .ignoreIfMissing()
-                .load();
-        String username = dotenv.get("BROWSERSTACK_USERNAME");
-        String accessKey = dotenv.get("BROWSERSTACK_ACCESS_KEY");
-        if (username == null || accessKey == null) {
-            Assertions.fail("Missing BROWSERSTACK_USERNAME or BROWSERSTACK_ACCESS_KEY env vars.");
-        }
-
-        this.sessionName = dotenv.get("BROWSERSTACK_SESSION_NAME", "Vansah + BrowserStack JUnit5 example");
-        String buildName = dotenv.get("BROWSERSTACK_BUILD_NAME", "vansah-browserstack-build");
-        String projectName = dotenv.get("BROWSERSTACK_PROJECT_NAME", "Vansah BrowserStack");
-        // W3C Capabilities
-        Map<String, Object> bstackOptions = new HashMap<>();
-        bstackOptions.put("os", "Windows");
-        bstackOptions.put("osVersion", "11");
-        bstackOptions.put("sessionName", sessionName);
-        bstackOptions.put("projectName", projectName);
-        bstackOptions.put("buildName", buildName);
-
-        DesiredCapabilities caps = new DesiredCapabilities();
-        caps.setCapability("browserName", "Chrome");
-        caps.setCapability("browserVersion", "latest");
-        caps.setCapability("bstack:options", bstackOptions);
-
-        String hub = "https://" + username + ":" + accessKey + "@hub-cloud.browserstack.com/wd/hub";
-        driver = new RemoteWebDriver(new URI(hub).toURL(), caps);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-
-        // Vansah setup
-        vansah = new VansahNode();
-        String vansahUrl = dotenv.get("VANSAH_URL");
-        String vansahToken = dotenv.get("VANSAH_TOKEN");
-        String jiraIssueKey = dotenv.get("VANSAH_JIRA_ISSUE_KEY");
-        String environment = dotenv.get("VANSAH_ENVIRONMENT");
-        testCaseKey = dotenv.get("VANSAH_TESTCASE_KEY");
-        String projectKey = dotenv.get("VANSAH_PROJECT_KEY");
-
-        if (vansahUrl != null)
-            vansah.setVansahURL(vansahUrl);
-        if (vansahToken != null)
-            vansah.setVansahToken(vansahToken);
-        if (environment != null)
-            vansah.setENVIRONMENT_NAME(environment);
-        if (projectKey != null)
-            VansahNode.setProjectKey(projectKey);
-        if (jiraIssueKey != null) {
-            vansah.setJIRA_ISSUE_KEY(jiraIssueKey);
-        }
-
-        // Prefer JIRA issue based run if keys are present; else, fall back to
-        // folder/plan based via env vars
-        try {
-            if (testCaseKey != null && jiraIssueKey != null) {
-                vansah.addTestRunFromJIRAIssue(testCaseKey);
-            } else {
-                String folderPath = System.getProperty("VANSAH_FOLDER_PATH", System.getenv("VANSAH_FOLDER_PATH"));
-                String stpKey = System.getProperty("VANSAH_STP_KEY", System.getenv("VANSAH_STP_KEY"));
-                String atpKey = System.getProperty("VANSAH_ATP_KEY", System.getenv("VANSAH_ATP_KEY"));
-                String atpAsset = System.getProperty("VANSAH_ATP_ASSET_TYPE", System.getenv("VANSAH_ATP_ASSET_TYPE")); // folder|issue
-
-                if (testCaseKey != null && folderPath != null) {
-                    vansah.setFOLDERPATH(folderPath);
-                    vansah.addTestRunFromTestFolder(testCaseKey);
-                } else if (testCaseKey != null && atpKey != null && atpAsset != null) {
-                    vansah.setAdvancedTestPlanKey(atpKey);
-                    vansah.addTestRunFromAdvancedTestPlan(atpAsset, testCaseKey);
-                } else if (testCaseKey != null && stpKey != null) {
-                    vansah.setStandardTestPlanKey(stpKey);
-                    vansah.addTestRunFromStandardTestPlan(testCaseKey);
-                } else {
-                    System.out.println(
-                            "[INFO] Vansah is not fully configured. The test will run on BrowserStack, but results will not be pushed to Vansah until env vars are set.");
-                }
-            }
-        } catch (Exception e) {
-            Assertions.fail("Failed to create Vansah test run: " + e.getMessage(), e);
-        }
-    }
-
+    /**
+     * Visits the target website and validates that the page title is not empty.
+     * 
+     * If successful, it logs the step result in Vansah for a Jira Work item and sets the BrowserStack session status
+     * to "passed". Otherwise, it marks the session as "failed" and logs the error in Vansah.
+     *
+     * @throws IOException           if an error occurs during screenshot capture or
+     *                               file operations
+     * @throws MalformedURLException if the provided URL is malformed
+     * @throws URISyntaxException    if the URL syntax is invalid
+     */
     @Test
     @Order(1)
-    void visitExampleDotComAndAssertTitle() throws IOException, MalformedURLException, URISyntaxException {
+    void demoJiraWorkItemAssertTitle() throws IOException, MalformedURLException, URISyntaxException {
         try {
-            driver.get("https://www.example.com/");
+            driver.get("https://selenium.vansah.io/");
             takeStepScreenshotAndLogToVansah("passed", "Loaded example.com home page", 1);
+
             String title = driver.getTitle();
             Assertions.assertTrue(title != null && !title.isEmpty(), "Title should not be empty");
+
             setBrowserStackStatus("passed", "Title check passed");
             safeAddTestLog("passed", "Title is present: " + title, 2, null);
         } catch (AssertionError | RuntimeException e) {
@@ -139,6 +64,16 @@ public class VansahBrowserStackTest {
         }
     }
 
+    /**
+     * Updates the BrowserStack session status based on test outcome.
+     * 
+     * <p>
+     * This uses BrowserStack’s JavaScript executor API to set session metadata
+     * for visibility in the BrowserStack dashboard.
+     *
+     * @param status the test result status, typically "passed" or "failed"
+     * @param reason the descriptive reason or message for the status
+     */
     private void setBrowserStackStatus(String status, String reason) {
         try {
             ((JavascriptExecutor) driver).executeScript(
@@ -148,25 +83,56 @@ public class VansahBrowserStackTest {
         }
     }
 
+    /**
+     * Captures a screenshot of the current browser step, saves it locally,
+     * and logs it to Vansah with a descriptive comment.
+     *
+     * @param result  the result of the step ("passed" or "failed")
+     * @param comment a short description of the test step
+     * @param step    the numerical order of the step in the test sequence
+     * @throws IOException if an error occurs while creating directories or copying
+     *                     files
+     */
     private void takeStepScreenshotAndLogToVansah(String result, String comment, int step) throws IOException {
         if (!(driver instanceof TakesScreenshot))
             return;
+
         File tmp = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
         Path out = Path.of("target", "screenshots");
         Files.createDirectories(out);
+
         Path file = out.resolve(sessionName.replaceAll("[^A-Za-z0-9._-]", "_") + "_step" + step + ".png");
         Files.copy(tmp.toPath(), file, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
         safeAddTestLog(result, comment, step, file.toFile());
     }
 
+    /**
+     * Ensures proper cleanup of browser resources after each test execution.
+     * 
+     * <p>
+     * Quits the WebDriver instance to prevent resource leaks between tests.
+     */
     @AfterEach
-    @SuppressWarnings("unused") // Used by JUnit 5
     void tearDown() {
         if (driver != null) {
             driver.quit();
         }
     }
 
+    /**
+     * Safely adds a test log entry to Vansah, including optional screenshot
+     * attachments.
+     * 
+     * <p>
+     * If Vansah is not initialized or an exception occurs, a warning is printed
+     * instead of throwing an error.
+     *
+     * @param result     the outcome of the step ("passed", "failed", etc.)
+     * @param comment    a descriptive note about the step
+     * @param step       the step number in the sequence
+     * @param screenshot optional screenshot file, can be {@code null}
+     */
     private void safeAddTestLog(String result, String comment, Integer step, File screenshot) {
         if (vansah == null)
             return;
@@ -181,6 +147,17 @@ public class VansahBrowserStackTest {
         }
     }
 
+    /**
+     * Safely updates the last test log entry in Vansah with a new status and
+     * comment.
+     * 
+     * <p>
+     * If Vansah is not initialized or an exception occurs, it logs a warning to the
+     * console.
+     *
+     * @param result  the new test status ("passed", "failed", etc.)
+     * @param comment the comment to associate with the update
+     */
     private void safeUpdateTestLog(String result, String comment) {
         if (vansah == null)
             return;
