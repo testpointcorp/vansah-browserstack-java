@@ -94,9 +94,12 @@ public class VansahBrowserStackTest extends TestSetup {
             setBrowserStackStatus("passed", "Title check passed");
             safeAddTestLog("passed", "Title is present: " + title, 2, null);
         } catch (AssertionError | RuntimeException e) {
-            setBrowserStackStatus("failed", e.getMessage());
-            safeUpdateTestLog("failed", "Failure: " + e.getMessage());
-            //Assertions.fail(e); throw error
+             String safeMessage = e.getMessage()
+                    .replace("<", "")
+                    .replace(">", "");
+            setBrowserStackStatus("failed", safeMessage);
+            safeUpdateTestLog("failed", "Failure: " + safeMessage);
+            // Assertions.fail(e); throw error
         }
     }
 
