@@ -45,24 +45,18 @@ This tutorial demonstrates you through the process of integrating Browserstack w
    cd vansah-browserstack-java
    ```
 
-2. **Install all Maven dependencies**  
-   Run the following command at the root of your project (where `pom.xml` is located):
-   ```bash
-   mvn install
-   ```
-
-3. **Configure environment variables**  
+2. **Configure environment variables**  
    Create a `.env` file using the example file provided at  
    `src/test/resources/.env.example`.
 
-4. **Run the Maven project**
+3. **Run the Maven project**
    ```bash
    mvn test
    ```
     - The test opens [selenium.vansah.io]("https://selenium.vansah.io/) on a real Chrome instance in BrowserStack.
     - It takes a screenshot, checks for the page title, adds step logs to Vansah, and marks the BrowserStack session *passed/failed*.
     - Screenshots are saved under `target/screenshots/` and uploaded to Vansah via `addTestLog(...)`.
-5. **Verify the results**
+4. **Verify the results**
    - Check your **BrowserStack dashboard** for the test run.  
    - View execution results in **Vansah for Jira**.
 
