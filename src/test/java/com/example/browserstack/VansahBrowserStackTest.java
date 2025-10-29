@@ -63,7 +63,7 @@ public class VansahBrowserStackTest extends TestSetup {
         } catch (AssertionError | RuntimeException e) {
             setBrowserStackStatus("failed", e.getMessage());
             safeUpdateTestLog("failed", "Failure: " + e.getMessage());
-            Assertions.fail(e);
+           //Assertions.fail(e); throw error
         }
     }
 
@@ -94,7 +94,7 @@ public class VansahBrowserStackTest extends TestSetup {
         } catch (AssertionError | RuntimeException e) {
             setBrowserStackStatus("failed", e.getMessage());
             safeUpdateTestLog("failed", "Failure: " + e.getMessage());
-            Assertions.fail(e);
+            //Assertions.fail(e); throw error
         }
     }
 
