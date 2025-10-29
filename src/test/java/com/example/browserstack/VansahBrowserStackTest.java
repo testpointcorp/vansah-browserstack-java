@@ -89,7 +89,7 @@ public class VansahBrowserStackTest extends TestSetup {
             takeStepScreenshotAndLogToVansah("passed", "Loaded home page", 1);
 
             String title = driver.getTitle();
-            Assertions.assertTrue("Selenium Website Testing Page – Use this page to automate ",title,"Title should match exactly");
+            Assertions.asserEquals("Selenium Website Testing Page – Use this page to automate ",title,"Title should match exactly");
 
             setBrowserStackStatus("passed", "Title check passed");
             safeAddTestLog("passed", "Title is present: " + title, 2, null);
