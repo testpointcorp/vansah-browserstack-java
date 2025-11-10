@@ -33,7 +33,7 @@ This tutorial demonstrates you through the process of integrating Browserstack w
 ## Prerequisites
 
 - Java 11+ and Maven 3.8+
-- Access to BrowserStack account with username and accesskey
+- Access to ['BrowserStack'](https://www.browserstack.com/users/sign_in?utm_source=vansah) account with username and accesskey
 - Make sure that [`Vansah`](https://marketplace.atlassian.com/apps/1224250/vansah-test-management-for-jira?tab=overview&hosting=cloud) is installed in your Jira workspace
 - You need to Generate **Vansah** [`connect`](https://docs.vansah.com/docs-base/generate-a-vansah-api-token-from-jira-cloud/) token to authenticate with Vansah APIs.
 
