@@ -55,7 +55,7 @@ With this integration, you can:
 - Java 11+ and Maven 3.8+  
 - Access to a [BrowserStack](https://www.browserstack.com/users/sign_in?utm_source=vansah) account with username and access key  
 - Ensure [Vansah](https://marketplace.atlassian.com/apps/1224250/vansah-test-management-for-jira?tab=overview&hosting=cloud) is installed in your Jira workspace  
-- Generate a [Vansah Connect Token](https://docs.vansah.com/docs-base/generate-a-vansah-api-token-from-jira-cloud/) to authenticate with Vansah APIs  
+- Generate a [Vansah Connect Token](https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira) to authenticate with Vansah APIs  
 
 ---
 
