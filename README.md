@@ -38,6 +38,7 @@ With this integration, you can:
 - [Viewing Results & Traceability](#viewing-results--traceability)
 - [Project Layout](#project-layout)
 - [Implementation in Your Project](#implementation-in-your-project)
+- [Reference](#reference)
 - [Contributing](#contributing)
 - [Developed By](#developed-by)
 
@@ -210,7 +211,7 @@ Before integrating it into your own project, ensure this demo runs successfully.
 
 ## Reference
 
-[Refer to our help page]('https://help.vansah.com/en/articles/12805701-integrating-browserstack-with-vansah)
+[Refer to our help page]('https://help.vansah.com/en/articles/12805701-integrating-browserstack-with-vansah')
 
 ## Contributing
 
