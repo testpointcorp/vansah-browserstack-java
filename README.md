@@ -57,7 +57,8 @@ With this integration, you can:
 - Access to a [BrowserStack](https://www.browserstack.com/users/sign_in?utm_source=vansah) account with Username and Access key  
 - Ensure [Vansah](https://marketplace.atlassian.com/apps/1224250/vansah-test-management-for-jira?tab=overview&hosting=cloud) is installed in your Jira workspace  
 - Generate a [Vansah Connect Token](https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira) to authenticate with Vansah APIs  
-- Ensure that your [Test Case Key](https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc) is linked to a [Jira Issue](https://help.vansah.com/en/articles/9822263-linking-test-cases-to-a-jira-issue), and a [Test Folder](https://help.vansah.com/en/articles/9822265-linking-test-cases-to-a-test-folder)
+- Ensure that you have [Test Cae Key](https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc) Linked to a [Jira Issue](https://help.vansah.com/en/articles/9822263-linking-test-cases-to-a-jira-issue), [Test Folder](https://help.vansah.com/en/articles/9822265-linking-test-cases-to-a-test-folder), and optional to a [Test Plan](https://help.vansah.com/en/articles/9855761-understanding-advanced-test-plans)
+
 ---
 
 ## Install / Clone
