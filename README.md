@@ -51,12 +51,13 @@ With this integration, you can:
 
 ---
 
-## Prerequisites
+## [Prerequisites](https://help.vansah.com/en/articles/10407923-vansah-api-connect-url)
 
 - Java 11+ and Maven 3.8+  
 - Access to a [BrowserStack](https://www.browserstack.com/users/sign_in?utm_source=vansah) account with Username and Access key  
 - Ensure [Vansah](https://marketplace.atlassian.com/apps/1224250/vansah-test-management-for-jira?tab=overview&hosting=cloud) is installed in your Jira workspace  
 - Generate a [Vansah Connect Token](https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira) to authenticate with Vansah APIs  
+- Ensure that you have [Test Cae Key](https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc) Linked to a [Jira Issue](https://help.vansah.com/en/articles/9822263-linking-test-cases-to-a-jira-issue), [Test Folder](https://help.vansah.com/en/articles/9822265-linking-test-cases-to-a-test-folder), and optional to a [Test Plan](https://help.vansah.com/en/articles/9855761-understanding-advanced-test-plans)
 
 ---
 
@@ -87,7 +88,7 @@ export BROWSERSTACK_SESSION_NAME="Vansah Trial Runs"
 # -------------------------------
 # Vansah Configuration
 # -------------------------------
-export VANSAH_BASE_URL= # https://prod.vansah.com
+export VANSAH_BASE_URL= # https://help.vansah.com/en/articles/10407923-vansah-api-connect-url
 export VANSAH_API_TOKEN= # https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira
 export VANSAH_ENVIRONMENT= # https://help.vansah.com/en/articles/9821822-test-environments
 export VANSAH_TESTCASE_KEY= # https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc
@@ -97,17 +98,17 @@ export VANSAH_TESTCASE_KEY= # https://help.vansah.com/en/articles/12814796-what-
 # -------------------------------
 
 # (A) Jira Issue style
-export VANSAH_JIRA_ISSUE_KEY="STM-1"
-export VANSAH_PROJECT_KEY="STM"
+export VANSAH_JIRA_ISSUE_KEY= # https://help.vansah.com/en/articles/9822263-linking-test-cases-to-a-jira-issue
+export VANSAH_PROJECT_KEY= # https://help.vansah.com/en/articles/9821808-updating-your-jira-project-key
 
 # (B) Folder style
-export VANSAH_FOLDER_PATH="folderpath/"
+export VANSAH_FOLDER_PATH= # https://help.vansah.com/en/articles/9824708-test-folder-path-in-test-case-export
 
 # (C) Standard Test Plan (STP)
-# export VANSAH_STP_KEY="KAN-P18"
+# export VANSAH_STP_KEY= # https://help.vansah.com/en/articles/9824605-creating-a-test-plan-from-a-test-folder
 
 # (D) Advanced Test Plan (ATP)
-# export VANSAH_ATP_KEY="KAN-P17"
+# export VANSAH_ATP_KEY= # https://help.vansah.com/en/articles/9855761-understanding-advanced-test-plans
 # export VANSAH_ATP_ASSET_TYPE="folder"  # or 'issue'
 ```
 Alternatively, create a `.env` file using the sample file located at:
@@ -212,9 +213,15 @@ Before integrating it into your own project, ensure this demo runs successfully.
 ## Reference
 
 [Refer to our help page](https://help.vansah.com/en/articles/12805701-integrating-browserstack-with-vansah)  
+[Get Vansah API Connect URL](https://help.vansah.com/en/articles/10407923-vansah-api-connect-url)  
 [Generate a Vansah Api Token](https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira)  
 [Generate and configure Vansah Test Environment](https://help.vansah.com/en/articles/9821822-test-environments)  
 [What is the Test Case in Vansah](https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc)  
+[Linking a Test Case to a Jira Issue](https://help.vansah.com/en/articles/9822263-linking-test-cases-to-a-jira-issue)  
+[Get Vansah Project Key](https://help.vansah.com/en/articles/9821808-updating-your-jira-project-key)  
+[Link Test Cases to Test Folder](https://help.vansah.com/en/articles/9822265-linking-test-cases-to-a-test-folder)  
+[Get Vansah Folder Path](https://help.vansah.com/en/articles/9824708-test-folder-path-in-test-case-export)  
+
 ## Contributing
 
 We welcome contributions!  
