@@ -51,13 +51,13 @@ With this integration, you can:
 
 ---
 
-## [Prerequisites](https://help.vansah.com/en/articles/10407923-vansah-api-connect-url)
+## Prerequisites
 
 - Java 11+ and Maven 3.8+  
 - Access to a [BrowserStack](https://www.browserstack.com/users/sign_in?utm_source=vansah) account with Username and Access key  
 - Ensure [Vansah](https://marketplace.atlassian.com/apps/1224250/vansah-test-management-for-jira?tab=overview&hosting=cloud) is installed in your Jira workspace  
 - Generate a [Vansah Connect Token](https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira) to authenticate with Vansah APIs  
-- Ensure that you have [Test Cae Key](https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc) Linked to a [Jira Issue](https://help.vansah.com/en/articles/9822263-linking-test-cases-to-a-jira-issue), [Test Folder](https://help.vansah.com/en/articles/9822265-linking-test-cases-to-a-test-folder), and optional to a [Test Plan](https://help.vansah.com/en/articles/9855761-understanding-advanced-test-plans)
+- Ensure that you have [Test Case Key](https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc) Linked to a [Jira Issue](https://help.vansah.com/en/articles/9822263-linking-test-cases-to-a-jira-issue), [Test Folder](https://help.vansah.com/en/articles/9822265-linking-test-cases-to-a-test-folder), and optional to a [Test Plan](https://help.vansah.com/en/articles/9855761-understanding-advanced-test-plans)
 
 ---
 
