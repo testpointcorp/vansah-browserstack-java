@@ -3,18 +3,18 @@
 </div>
 
 <p align="left">
-This repository provides a Java-based integration between <strong>Vansah</strong> and <strong>BrowserStack</strong>, enabling seamless test result synchronization and automated execution reporting.
+This repository provides a Java-based integration between <strong>Vansah</strong> and <strong>BrowserStack</strong>, enabling seamless Test Result synchronization and automated execution reporting.
 </p>
 
 <p align="left">
-It allows teams to connect BrowserStack test runs directly with Vansah Test Management, ensuring real-time visibility of automated test outcomes within Jira and other supported platforms.
+It allows teams to connect BrowserStack Test Runs directly with Vansah Test Management, ensuring real-time visibility of automated test outcomes within Jira.
 </p>
 
 <p align="left">
 With this integration, you can:
 <ul>
-  <li>Automatically update Vansah test results from BrowserStack executions</li>
-  <li>Link automated tests with Vansah Test Cases and Runs</li>
+  <li>Automatically update Vansah Test Results from BrowserStack executions</li>
+  <li>Link automated tests with Vansah Test Cases and Test Runs</li>
   <li>Streamline CI/CD workflows for improved traceability and reporting</li>
 </ul>
 </p>
@@ -47,14 +47,14 @@ With this integration, you can:
 ## Features
 
 - ✅ Ready-to-run **JUnit 5** and **Selenium** tests on BrowserStack  
-- ✅ Integrates with [Vansah Java Binding](https://github.com/testpointcorp/Vansah-API-Binding-Java/blob/prod/src/main/java/com/vansah/VansahNode.java) to create test runs and log steps (with screenshots)
+- ✅ Integrates with [Vansah Java Binding](https://github.com/testpointcorp/Vansah-API-Binding-Java/blob/prod/src/main/java/com/vansah/VansahNode.java) to create Test Runs and Log Steps (with screenshots)
 
 ---
 
 ## Prerequisites
 
 - Java 11+ and Maven 3.8+  
-- Access to a [BrowserStack](https://www.browserstack.com/users/sign_in?utm_source=vansah) account with username and access key  
+- Access to a [BrowserStack](https://www.browserstack.com/users/sign_in?utm_source=vansah) account with Username and Access key  
 - Ensure [Vansah](https://marketplace.atlassian.com/apps/1224250/vansah-test-management-for-jira?tab=overview&hosting=cloud) is installed in your Jira workspace  
 - Generate a [Vansah Connect Token](https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira) to authenticate with Vansah APIs  
 
@@ -87,10 +87,10 @@ export BROWSERSTACK_SESSION_NAME="Vansah Trial Runs"
 # -------------------------------
 # Vansah Configuration
 # -------------------------------
-export VANSAH_BASE_URL=https://<region-based-affix>.vansah.com
-export VANSAH_API_TOKEN=<your-vansah-api-token>
-export VANSAH_ENVIRONMENT="SYS"
-export VANSAH_TESTCASE_KEY="STM-C46"
+export VANSAH_BASE_URL= # https://prod.vansah.com
+export VANSAH_API_TOKEN= # https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira
+export VANSAH_ENVIRONMENT= # https://help.vansah.com/en/articles/9821822-test-environments
+export VANSAH_TESTCASE_KEY= # https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc
 
 # -------------------------------
 # Choose ONE style for Vansah execution
@@ -126,7 +126,7 @@ mvn test
 ```
 
 - The test opens [selenium.vansah.io](https://selenium.vansah.io/) on a real Chrome instance in BrowserStack.  
-- It validates the page title, captures screenshots, logs each step to Vansah, and updates the BrowserStack session status as *passed/failed*.  
+- It validates the page title, captures Screenshots, Logs each step to Vansah, and updates the BrowserStack session status as *passed/failed*.  
 - Screenshots are stored under `target/screenshots/` and automatically uploaded to Vansah via the `addTestLog(...)` method.
 
 ---
@@ -135,7 +135,7 @@ mvn test
 
 <ul>
   <li><strong>BrowserStack:</strong> View live and saved sessions, videos, and execution logs for each build.</li>
-  <li><strong>Vansah:</strong> Open your project, plan, or run to access:</li>
+  <li><strong>Vansah:</strong> Open your project, Test Plan, or Test Run to access:</li>
   <ul>
     <li>Test case execution status</li>
     <li>Linked BrowserStack session URL</li>
@@ -211,8 +211,10 @@ Before integrating it into your own project, ensure this demo runs successfully.
 
 ## Reference
 
-[Refer to our help page](https://help.vansah.com/en/articles/12805701-integrating-browserstack-with-vansah)
-
+[Refer to our help page](https://help.vansah.com/en/articles/12805701-integrating-browserstack-with-vansah)  
+[Generate a Vansah Api Token](https://help.vansah.com/en/articles/9824979-generate-a-vansah-api-token-from-jira)  
+[Generate and configure Vansah Test Environment](https://help.vansah.com/en/articles/9821822-test-environments)  
+[What is the Test Case in Vansah](https://help.vansah.com/en/articles/12814796-what-is-a-test-case#h_529238a0fc)  
 ## Contributing
 
 We welcome contributions!  
@@ -223,3 +225,4 @@ Feel free to open issues or submit pull requests to improve this integration.
 ## Developed By
 
 [Vansah](https://vansah.com/)
+
